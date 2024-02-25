@@ -1,0 +1,7 @@
+name: MlgRush
+version: '${version}'
+main: de.cool_miner2021.mlgrush.MlgRush
+api-version: '1.20'
+load: STARTUP
+commands:
+  mlg:
