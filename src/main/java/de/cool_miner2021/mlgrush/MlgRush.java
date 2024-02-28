@@ -8,12 +8,12 @@ public final class MlgRush extends JavaPlugin {
 
     @Override
     public void onEnable() {
-
-        getLogger().info("MLG Rush Plugin aktiviert!");
-
         getCommand("mlg").setExecutor(new MlgCommand());
+        getCommand("reset").setExecutor(new ResetCmd());
 
         getServer().getPluginManager().registerEvents(new Listeners(), this);
+
+        getLogger().info("MLG Rush Plugin aktiviert!");
     }
 
     @Override

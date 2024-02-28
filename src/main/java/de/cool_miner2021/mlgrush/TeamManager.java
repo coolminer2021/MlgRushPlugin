@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class TeamManager {
     private static TeamManager instance;
-    private Map<Player, String> playerTeams;
+    public Map<Player, String> playerTeams;
     private Map<String, Integer> teamPoints;
 
     private TeamManager() {
@@ -42,4 +42,5 @@ public class TeamManager {
         teamPoints=new HashMap<>();
         playerTeams=new HashMap<>();
     }
+
 }

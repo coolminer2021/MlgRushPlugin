@@ -11,7 +11,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-
 public class MlgCommand implements CommandExecutor {
     private Player waitingPlayer = null;
     @Override
@@ -21,37 +20,55 @@ public class MlgCommand implements CommandExecutor {
             return true;
         }
 
-        if (waitingPlayer == null) {
-            waitingPlayer = player;
-            player.sendMessage("Warte auf den zweiten Spieler...");
+        TeamManager teamManager = TeamManager.getInstance();
 
-        } else {
-            startGame(waitingPlayer, player);
-            waitingPlayer = null;
+        if (teamManager.playerTeams.isEmpty()){
+            if (waitingPlayer == null) {
+                waitingPlayer = player;
+                player.sendMessage(MlgRush.prefix+"Warte auf den zweiten Spieler...");
+
+            } else {
+                startGame(waitingPlayer, player);
+                waitingPlayer = null;
+            }
+        }else {
+            player.sendMessage(MlgRush.prefix+"§cEs läuft bereits eine Runde!");
         }
-
         return true;
     }
 
     public static void giveItemsToPlayer(Player p) {
-
         ItemStack knockbackStick = new ItemStack(Material.BLAZE_ROD);
         knockbackStick.addUnsafeEnchantment(Enchantment.KNOCKBACK,2);
 
-
         ItemStack netheritePickaxe = new ItemStack(Material.NETHERITE_PICKAXE);
-        netheritePickaxe.addEnchantment(Enchantment.DIG_SPEED, 5);
+        netheritePickaxe.addEnchantment(Enchantment.DIG_SPEED, 4);
 
-
-        ItemStack glass = new ItemStack(Material.GLASS, 64);
-
+        ItemStack sandstone = new ItemStack(Material.SANDSTONE, 64);
 
         PlayerInventory inventory = p.getInventory();
         inventory.setItem(0, knockbackStick);
         inventory.setItem(1, netheritePickaxe);
-        inventory.setItem(2, glass);
-        inventory.setItem(3, glass);
+        inventory.setItem(2, sandstone);
+        inventory.setItem(3, sandstone);
 
+    }
+
+    public void setupPlayer(Player p){
+        switch (TeamManager.getInstance().getPlayerTeam(p)){
+            case "Red" -> {
+                p.teleport(new Location(p.getWorld(),0.5,-57,-22.5).setDirection(new Vector(0,0,1)));
+                p.setPlayerListName("§c"+p.getName());
+                p.sendMessage(MlgRush.prefix+"Das Spiel beginnt, du bist §cROT");
+            }
+            case "Blue" -> {
+                p.teleport(new Location(p.getWorld(),0.5,-57,22.5).setDirection(new Vector(0,0,-1)));
+                p.setPlayerListName("§9"+p.getName());
+                p.sendMessage(MlgRush.prefix+"Das Spiel beginnt, du bist §9BLAU");
+            }
+        }
+        p.setGameMode(GameMode.SURVIVAL);
+        giveItemsToPlayer(p);
     }
 
     private void startGame(Player player1, Player player2) {
@@ -62,17 +79,8 @@ public class MlgCommand implements CommandExecutor {
             teamManager.assignPlayerToTeam(player1,"Red");
             teamManager.assignPlayerToTeam(player2,"Blue");
 
-
-            player1.teleport(new Location(player1.getWorld(),0.5,-57,-22.5).setDirection(new Vector(0,0,1)));
-            player2.teleport(new Location(player2.getWorld(),0.5,-57,22.5).setDirection(new Vector(0,0,-1)));
-            player1.sendMessage(MlgRush.prefix+"Das Spiel beginnt, du bist §cROT");
-            player2.sendMessage(MlgRush.prefix+"Das Spiel beginnt, du bist §9BLAU");
-
-            giveItemsToPlayer(player1);
-            giveItemsToPlayer(player2);
-
-            player1.setPlayerListName("§c"+player1.getName());
-            player1.setPlayerListName("§9"+player1.getName());
+            setupPlayer(player1);
+            setupPlayer(player2);
 
             world.setDifficulty(Difficulty.PEACEFUL);
             world.setGameRule(GameRule.DO_IMMEDIATE_RESPAWN, true);
